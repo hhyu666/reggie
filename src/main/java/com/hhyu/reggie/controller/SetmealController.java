@@ -15,6 +15,8 @@ import com.hhyu.reggie.sevice.Setmealservice;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +43,7 @@ public class SetmealController {
      * @return
      */
     @PostMapping
+    @CacheEvict(value = "setmealCache",allEntries = true)
     public R<String> save(HttpServletRequest request,@RequestBody SetmealDto setmealDto){
         Long empid=(Long) request.getSession().getAttribute("employee");
         BaseContext.setThreadLocal(empid);
@@ -86,6 +89,7 @@ public class SetmealController {
     }
 
     @GetMapping("/list")
+    @Cacheable(value = "setmealCache",key = "#setmeal.categoryId")
     public R<List<Setmeal>> list(Setmeal setmeal){
         //创建条件构造器
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
